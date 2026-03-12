@@ -1,19 +1,32 @@
 {
-  "name": "ninjalinking-mcp-orders",
+  "name": "ninjalinking-mcp",
   "version": "1.0.0",
-  "description": "MCP server for managing Ninjalinking orders via Laravel API",
+  "description": "MCP server for NinjaLinking — manage backlink orders via AI assistants (Claude, ChatGPT)",
   "main": "dist/index.js",
+  "bin": {
+    "ninjalinking-mcp": "dist/index.js"
+  },
   "type": "module",
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc && node dist/index.js",
     "watch": "tsc --watch",
-    "test": "tsc && node dist/test.js"
+    "prepare": "npm run build"
   },
-  "keywords": ["mcp", "ninjalinking", "orders"],
-  "author": "",
+  "keywords": ["mcp", "ninjalinking", "backlinks", "seo", "orders", "ai", "claude", "model-context-protocol"],
+  "author": "NinjaLinking <axelguyennot@ninjalinking.fr>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AxxlSEO/ninjalinking-mcp"
+  },
+  "homepage": "https://app.ninjalinking.fr/mcp-access",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "dotenv": "^16.4.5"

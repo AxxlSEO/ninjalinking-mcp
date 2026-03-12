@@ -1,179 +1,159 @@
-# Ninjalinking MCP Orders Server
+# NinjaLinking MCP Server
 
-Serveur MCP (Model Context Protocol) pour gérer les commandes Ninjalinking via l'API Laravel.
+Serveur MCP (Model Context Protocol) pour l'API NinjaLinking. Permet à Claude, ChatGPT et tout assistant IA compatible MCP de passer des commandes de backlinks, gérer les crédits et suivre les commandes.
 
-## Installation
+## Installation rapide
 
-```bash
-npm install
-```
+### Claude Code
 
-## Configuration
-
-1. Copiez le fichier `.env.example` vers `.env` :
-```bash
-cp .env.example .env
-```
-
-2. Configurez les variables d'environnement dans `.env` :
-```env
-GOUDO_API_URL=https://your-laravel-api.com
-GOUDO_API_TOKEN=your-bearer-token-here
-```
-
-## Build
-
-```bash
-npm run build
-```
-
-## Utilisation
-
-### Démarrer le serveur
-```bash
-npm start
-```
-
-### Mode développement (avec recompilation)
-```bash
-npm run dev
-```
-
-### Watch mode
-```bash
-npm run watch
-```
-
-## Resources exposées
-
-### 1. `orders://pending`
-Liste toutes les commandes payées en attente de traitement.
-
-**Endpoint:** `GET /api/mcp/orders?status=paid`
-
-### 2. `orders://{id}/details`
-Récupère les détails d'une commande spécifique.
-
-**Endpoint:** `GET /api/mcp/orders/{id}`
-
-**Exemple:** `orders://123/details`
-
-### 3. `orders://links/pending`
-Liste tous les liens en attente de finalisation.
-
-**Endpoint:** `GET /api/mcp/links/pending`
-
-## Tools exposés
-
-### 1. `complete_link`
-Marque un lien comme complété avec les détails du forum.
-
-**Paramètres:**
-- `link_id` (number, requis): ID du lien à compléter
-- `forum_url` (string, requis): URL du post de forum où le lien a été publié
-- `anchor_used` (string, requis): Texte d'ancre utilisé pour le lien
-- `forum_domain` (string, optionnel): Domaine du forum
-- `notes` (string, optionnel): Notes additionnelles
-
-**Endpoint:** `POST /api/mcp/links/{link_id}/complete`
-
-**Exemple:**
-```json
-{
-  "link_id": 456,
-  "forum_url": "https://forum.example.com/thread/123",
-  "anchor_used": "meilleur casino en ligne",
-  "forum_domain": "forum.example.com",
-  "notes": "Lien publié avec succès"
-}
-```
-
-### 2. `update_link_step`
-Met à jour l'étape de travail d'un lien.
-
-**Paramètres:**
-- `link_id` (number, requis): ID du lien à mettre à jour
-- `work_step` (string, requis): Nouvelle étape de travail
-
-**Endpoint:** `POST /api/mcp/links/{link_id}/work-step`
-
-**Exemple:**
-```json
-{
-  "link_id": 456,
-  "work_step": "in_progress"
-}
-```
-
-## Authentification
-
-Tous les appels API incluent automatiquement le header :
-```
-Authorization: Bearer {GOUDO_API_TOKEN}
-```
-
-## Logs
-
-Les logs sont écrits sur `stderr` pour faciliter le débogage :
-- `[MCP]` : Événements du serveur MCP
-- `[API]` : Requêtes HTTP vers l'API Laravel
-- `[ERROR]` : Erreurs critiques
-
-## Structure du projet
-
-```
-ninjalinking-mcp-orders/
-├── src/
-│   ├── index.ts        # Serveur MCP principal
-│   ├── api-client.ts   # Client API Laravel
-│   └── types.ts        # Définitions TypeScript
-├── dist/               # Fichiers compilés (généré)
-├── .env.example        # Exemple de configuration
-├── .env                # Configuration locale (à créer)
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-## Configuration Claude Desktop
-
-Pour utiliser ce serveur avec Claude Desktop, ajoutez-le à votre configuration MCP :
+Ajoutez dans `~/.claude.json` :
 
 ```json
 {
   "mcpServers": {
-    "ninjalinking-orders": {
-      "command": "node",
-      "args": ["/path/to/ninjalinking-mcp-orders/dist/index.js"],
+    "ninjalinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "ninjalinking-mcp@latest"],
       "env": {
-        "GOUDO_API_URL": "https://your-laravel-api.com",
-        "GOUDO_API_TOKEN": "your-bearer-token-here"
+        "NINJALINKING_API_URL": "https://app.ninjalinking.fr",
+        "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
       }
     }
   }
 }
 ```
 
-Ou utilisez le fichier `.env` et lancez avec :
+### Claude Desktop
+
+Ajoutez dans votre `claude_desktop_config.json` :
 
 ```json
 {
   "mcpServers": {
-    "ninjalinking-orders": {
-      "command": "node",
-      "args": ["/path/to/ninjalinking-mcp-orders/dist/index.js"],
-      "cwd": "/path/to/ninjalinking-mcp-orders"
+    "ninjalinking": {
+      "command": "npx",
+      "args": ["-y", "ninjalinking-mcp@latest"],
+      "env": {
+        "NINJALINKING_API_URL": "https://app.ninjalinking.fr",
+        "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
+      }
     }
   }
 }
 ```
 
-## Gestion des erreurs
+### Obtenir votre clé API
 
-Le serveur gère les erreurs de manière robuste :
-- Validation des paramètres obligatoires
-- Gestion des erreurs HTTP (4xx, 5xx)
-- Gestion des erreurs réseau
-- Logs détaillés pour le débogage
+1. Connectez-vous sur [app.ninjalinking.fr](https://app.ninjalinking.fr)
+2. Allez dans **Accès API** (`/api-access`)
+3. Cliquez sur **Générer ma clé API**
+4. Copiez la clé affichée (elle n'est affichée qu'une seule fois)
 
-Toutes les erreurs sont retournées avec des messages clairs pour faciliter le diagnostic.
+## Outils disponibles
+
+### Compte & crédits
+
+| Outil | Description |
+|-------|-------------|
+| `get_profile` | Profil du compte (nom, email, crédits, rôle) |
+| `get_credits` | Solde de crédits actuel |
+| `get_credit_history` | Historique des transactions de crédits |
+| `get_available_packs` | Packs de crédits disponibles avec prix |
+
+### Commandes
+
+| Outil | Description |
+|-------|-------------|
+| `list_orders` | Lister les commandes (filtres: statut, recherche) |
+| `get_order` | Détails d'une commande et ses liens |
+| `create_order` | Créer une commande de backlinks (1 lien = 1 crédit) |
+| `pay_order` | Payer une commande impayée avec le solde de crédits |
+| `get_link` | Détail d'un lien et son statut de vérification |
+
+### Délégations
+
+| Outil | Description |
+|-------|-------------|
+| `list_delegations` | Lister les commandes en délégation |
+| `get_delegation` | Détails d'une commande en délégation |
+| `create_delegation` | Créer une délégation (campagne clé en main) |
+
+## Exemples d'utilisation
+
+Une fois configuré, parlez à votre assistant IA :
+
+- *"Commande 5 backlinks pour monsite.fr avec des ancres exactes, livraison mai 2026"*
+- *"Montre-moi l'état de mes commandes en cours"*
+- *"Combien de crédits il me reste ?"*
+- *"Crée une délégation de 20 liens pour monsite.fr en paiement mensuel"*
+
+## Détails des outils
+
+### create_order
+
+Crée une commande de backlinks. Chaque lien coûte 1 crédit.
+
+**Paramètres :**
+
+| Paramètre | Type | Requis | Description |
+|-----------|------|--------|-------------|
+| `label` | string | Non | Nom de la commande |
+| `links` | array | Oui | Liens à commander (max 55 au total) |
+| `links[].page_target` | string | Oui | URL cible du backlink |
+| `links[].anchor_type` | string | Oui | `exact`, `partial` ou `generic` |
+| `links[].niche` | string | Non | Catégorie/thématique |
+| `links[].delivery_date` | string | Non | Mois de livraison (format `YYYY-MM`) |
+| `links[].comment` | string | Non | Instructions supplémentaires |
+| `links[].qty` | number | Non | Nombre de backlinks (défaut: 1) |
+
+Si le solde de crédits est suffisant, ils sont débités automatiquement. Sinon, la commande est créée avec le statut `unpaid`.
+
+### create_delegation
+
+Crée une commande en délégation (campagne clé en main gérée par NinjaLinking).
+
+**Paramètres :**
+
+| Paramètre | Type | Requis | Description |
+|-----------|------|--------|-------------|
+| `details` | string | Oui | Description du projet et objectifs |
+| `site` | string[] | Oui | URLs des sites cibles |
+| `qty` | number | Oui | Nombre de backlinks souhaités (max 199) |
+| `budget` | number | Non | Indication de budget en euros |
+| `payment_mode` | string | Oui | `onetime` ou `monthly` |
+
+Retourne une URL Stripe pour le paiement.
+
+### list_orders
+
+**Paramètres optionnels :**
+
+| Paramètre | Type | Description |
+|-----------|------|-------------|
+| `status` | string | Filtrer : `unpaid`, `paid`, `pending`, `in_control`, `complete` |
+| `search` | string | Recherche dans numéro, label, URL, ancre |
+| `page_size` | number | Résultats par page (défaut: 50, `-1` pour tout) |
+
+## Variables d'environnement
+
+| Variable | Requis | Description |
+|----------|--------|-------------|
+| `NINJALINKING_API_URL` | Oui | `https://app.ninjalinking.fr` |
+| `NINJALINKING_API_TOKEN` | Oui | Clé API générée depuis votre compte |
+
+## Développement
+
+```bash
+git clone https://github.com/AxxlSEO/ninjalinking-mcp.git
+cd ninjalinking-mcp
+npm install
+cp .env.example .env  # Remplir avec vos credentials
+npm run build
+npm run dev           # Build + lancer le serveur
+```
+
+## Support
+
+- Documentation : [app.ninjalinking.fr/api-access](https://app.ninjalinking.fr/api-access)
+- Contact : support@ninjalinking.fr
