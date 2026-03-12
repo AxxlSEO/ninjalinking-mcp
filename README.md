@@ -14,7 +14,7 @@ Ajoutez dans `~/.claude.json` :
     "ninjalinking": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "ninjalinking-mcp@latest"],
+      "args": ["-y", "github:AxxlSEO/ninjalinking-mcp"],
       "env": {
         "NINJALINKING_API_URL": "https://app.ninjalinking.fr",
         "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
@@ -33,7 +33,7 @@ Ajoutez dans votre `claude_desktop_config.json` :
   "mcpServers": {
     "ninjalinking": {
       "command": "npx",
-      "args": ["-y", "ninjalinking-mcp@latest"],
+      "args": ["-y", "github:AxxlSEO/ninjalinking-mcp"],
       "env": {
         "NINJALINKING_API_URL": "https://app.ninjalinking.fr",
         "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
