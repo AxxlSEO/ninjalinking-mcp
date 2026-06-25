@@ -156,4 +156,4 @@ npm run dev           # Build + lancer le serveur
 ## Support
 
 - Documentation : [app.ninjalinking.fr/api-access](https://app.ninjalinking.fr/api-access)
-- Contact : support@ninjalinking.fr
+- Contact : axelguyennot@ninjalinking.fr
