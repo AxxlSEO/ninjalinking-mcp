@@ -83,13 +83,18 @@ const TOOLS = [
   {
     name: 'create_order',
     description:
-      'Create a new backlink order. Each link costs 1 credit. If you have enough credits they are debited automatically; otherwise the order is created with status "unpaid". Each link entry needs: page_target (URL to link to), anchor_type (exact, partial, or generic). Optional: niche, delivery_date (YYYY-MM format), comment, qty (number of backlinks for this target, default 1).',
+      'Create a new backlink order. Each link costs 1 credit. If you have enough credits they are debited automatically; otherwise the order is created with status "unpaid". Each link entry needs: page_target (full URL to link to) and anchor_type (free text describing the desired anchor). Optional: delivery_date (YYYY-MM format), comment, qty (number of backlinks for this target, default 1). IMPORTANT before calling: confirm the target URL, the anchor, and the delivery month of each link with the user; never invent an anchor — ask for it. Creating an order spends credits (1 per link): confirm with the user first, and if the total may exceed their balance, check get_credits and warn them.',
     inputSchema: {
       type: 'object',
       properties: {
         label: {
           type: 'string',
           description: 'A label/name for this order (optional)',
+        },
+        customer_email: {
+          type: 'string',
+          description:
+            'Admin only: place this order on behalf of the customer who has this email. Ignored for regular customer accounts (the order is always created for the authenticated user).',
         },
         links: {
           type: 'array',
@@ -103,13 +108,8 @@ const TOOLS = [
               },
               anchor_type: {
                 type: 'string',
-                enum: ['exact', 'partial', 'generic'],
                 description:
-                  'Type of anchor text: exact (exact match keyword), partial (partial match), generic (generic/brand anchor)',
-              },
-              niche: {
-                type: 'string',
-                description: 'Topic/niche category for the backlink (optional)',
+                  'Anchor text or anchor type, free text (e.g. "exact", "partial", "generic", or a specific anchor)',
               },
               delivery_date: {
                 type: 'string',
@@ -135,7 +135,7 @@ const TOOLS = [
   {
     name: 'pay_order',
     description:
-      'Pay an unpaid order using your credit balance. Debits the required credits (1 per link) and changes order status to "paid".',
+      'Pay an unpaid order using your credit balance. Debits the required credits (1 per link) and changes order status to "paid". This spends credits — confirm the credit cost with the user before calling.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -199,23 +199,29 @@ const TOOLS = [
   {
     name: 'create_delegation',
     description:
-      'Create a new delegation order (fully managed backlink campaign). NinjaLinking handles everything. Returns a Stripe checkout URL for payment. Pricing is tiered based on quantity and payment mode.',
+      'Create a new delegation order (fully managed backlink campaign). NinjaLinking handles everything. Returns a Stripe checkout URL for payment. Pricing is tiered based on quantity and payment mode. Use a delegation when the user wants NinjaLinking to handle the whole campaign; for specific links the user chooses themselves, use create_order instead. This generates a Stripe payment — confirm with the user before calling.',
     inputSchema: {
       type: 'object',
       properties: {
         details: {
           type: 'string',
+          minLength: 10,
           description:
-            'Description of the project, goals, and any specific requirements',
+            'Description of the project, goals, and any specific requirements (at least 10 characters)',
         },
         site: {
           type: 'array',
-          items: { type: 'string' },
-          description: 'Array of target site URLs',
+          minItems: 1,
+          items: { type: 'string', format: 'uri' },
+          description:
+            'Array of target site URLs. Each entry must be a valid URL including the scheme (e.g. https://monsite.fr)',
         },
         qty: {
           type: 'number',
-          description: 'Number of backlinks desired (max 199)',
+          minimum: 4,
+          maximum: 199,
+          description:
+            'Number of backlinks desired (between 4 and 199). For fewer than 4, use create_order instead.',
         },
         budget: {
           type: 'number',
@@ -313,7 +319,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!a.links || !Array.isArray(a.links) || a.links.length === 0) {
           return fail(
             'The "links" array is required and must contain at least one link.',
-            'Each link needs: page_target (URL) and anchor_type (exact, partial, or generic).'
+            'Each link needs: page_target (a full URL) and anchor_type (the anchor text — ask the user, do not invent).'
           );
         }
         const totalQty = a.links.reduce(
@@ -326,7 +332,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             'Split into multiple orders or reduce the qty values.'
           );
         }
-        const res = await api.createOrder({ label: a.label, links: a.links });
+        // Earliest allowed delivery month = next month (mirrors the website).
+        const dMin = new Date();
+        dMin.setDate(1);
+        dMin.setMonth(dMin.getMonth() + 1);
+        const minMonth = `${dMin.getFullYear()}-${String(dMin.getMonth() + 1).padStart(2, '0')}`;
+        // Per-link guards: catch the common real-world mistakes before the API call.
+        for (let i = 0; i < a.links.length; i++) {
+          const l = a.links[i];
+          const n = i + 1;
+          if (!l?.anchor_type || !String(l.anchor_type).trim()) {
+            return fail(
+              `Link ${n}: the anchor (anchor_type) is required.`,
+              'Ask the user which anchor text they want — never invent one.'
+            );
+          }
+          if (!/^https?:\/\/.+/i.test(String(l?.page_target ?? ''))) {
+            return fail(
+              `Link ${n}: page_target must be a full URL including http(s):// (got "${l?.page_target ?? ''}").`,
+              'Ask the user for the exact target URL.'
+            );
+          }
+          if (l.delivery_date != null && l.delivery_date !== '') {
+            if (!/^\d{4}-\d{2}$/.test(String(l.delivery_date))) {
+              return fail(
+                `Link ${n}: delivery_date must use the YYYY-MM format.`,
+                'Example: 2026-08.'
+              );
+            }
+            if (String(l.delivery_date) < minMonth) {
+              return fail(
+                `Link ${n}: delivery_date ${l.delivery_date} is in the past. The earliest delivery month is ${minMonth}.`,
+                'Confirm a delivery month from next month onward with the user.'
+              );
+            }
+          }
+        }
+        const res = await api.createOrder({
+          label: a.label,
+          customer_email: a.customer_email,
+          links: a.links,
+        });
         if (res.error) {
           return fail(
             res.error,
@@ -378,10 +424,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'create_delegation': {
         const a = args as any;
-        if (a.qty > 199) {
+        // Mirror the server-side validation (DelegationOrderController@create)
+        // so the assistant gets an actionable message without a failed round-trip.
+        if (typeof a.qty !== 'number' || !Number.isInteger(a.qty) || a.qty < 4 || a.qty > 199) {
           return fail(
-            'Maximum 199 backlinks per delegation order. For larger volumes, contact NinjaLinking directly.',
-            'Reduce qty to 199 or less.'
+            'Delegation orders require between 4 and 199 backlinks (qty).',
+            (a.qty ?? 0) < 4
+              ? 'For fewer than 4 backlinks, use create_order (credit-based) instead.'
+              : 'For more than 199 backlinks, contact NinjaLinking directly.'
+          );
+        }
+        if (!a.details || String(a.details).trim().length < 10) {
+          return fail(
+            'The "details" field must be at least 10 characters describing the project and its goals.',
+            'Provide a short brief: target pages, themes, and objectives.'
+          );
+        }
+        if (
+          !Array.isArray(a.site) ||
+          a.site.length === 0 ||
+          !a.site.every((s: any) => /^https?:\/\/.+/i.test(String(s)))
+        ) {
+          return fail(
+            'The "site" field must be a non-empty array of valid URLs (including https://).',
+            'Example: ["https://monsite.fr", "https://monsite.fr/une-page"].'
           );
         }
         const res = await api.createDelegation({
