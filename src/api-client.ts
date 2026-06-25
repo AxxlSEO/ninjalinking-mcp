@@ -1,13 +1,20 @@
 import type {
   ApiResponse,
-  Order,
-  Link,
-  User,
   Credit,
   DelegatedOrder,
   CreateOrderParams,
   CreateDelegationParams,
   PaginatedResponse,
+  ProfileResponse,
+  CreditsResponse,
+  PacksResponse,
+  OrdersListResponse,
+  OrderDetailsResponse,
+  CreateOrderResponse,
+  PayOrderResponse,
+  DelegationDetailsResponse,
+  CreateDelegationResponse,
+  LinkResponse,
 } from './types.js';
 
 export class NinjalinkingApiClient {
@@ -76,8 +83,8 @@ export class NinjalinkingApiClient {
   }
 
   // ── Auth / Profile ──────────────────────────────────────────────
-  async getProfile(): Promise<ApiResponse<User>> {
-    return this.request<User>('/api/auth/me');
+  async getProfile(): Promise<ApiResponse<ProfileResponse>> {
+    return this.request<ProfileResponse>('/api/auth/me');
   }
 
   // ── Orders ──────────────────────────────────────────────────────
@@ -85,38 +92,38 @@ export class NinjalinkingApiClient {
     status?: string;
     search?: string;
     pageSize?: number;
-  }): Promise<ApiResponse<PaginatedResponse<Order>>> {
+  }): Promise<ApiResponse<OrdersListResponse>> {
     const params = new URLSearchParams();
     if (filters?.pageSize) params.set('pageSize', String(filters.pageSize));
     if (filters?.status) params.set('filters[status]', filters.status);
     if (filters?.search) params.set('filters[search]', filters.search);
     const qs = params.toString();
-    return this.request<PaginatedResponse<Order>>(`/api/orders${qs ? '?' + qs : ''}`);
+    return this.request<OrdersListResponse>(`/api/orders${qs ? '?' + qs : ''}`);
   }
 
-  async getOrder(id: string): Promise<ApiResponse<Order>> {
-    return this.request<Order>(`/api/orders/${id}`);
+  async getOrder(id: string): Promise<ApiResponse<OrderDetailsResponse>> {
+    return this.request<OrderDetailsResponse>(`/api/orders/${id}`);
   }
 
-  async createOrder(params: CreateOrderParams): Promise<ApiResponse<Order>> {
-    return this.request<Order>('/api/orders', 'POST', params);
+  async createOrder(params: CreateOrderParams): Promise<ApiResponse<CreateOrderResponse>> {
+    return this.request<CreateOrderResponse>('/api/orders', 'POST', params);
   }
 
-  async payOrder(id: string): Promise<ApiResponse<Order>> {
-    return this.request<Order>(`/api/orders/${id}/pay`, 'POST');
+  async payOrder(id: string): Promise<ApiResponse<PayOrderResponse>> {
+    return this.request<PayOrderResponse>(`/api/orders/${id}/pay`, 'POST');
   }
 
   // ── Credits / Payments ──────────────────────────────────────────
-  async getCredits(): Promise<ApiResponse<{ credits: number }>> {
-    return this.request<{ credits: number }>('/api/payments/credits');
+  async getCredits(): Promise<ApiResponse<CreditsResponse>> {
+    return this.request<CreditsResponse>('/api/payments/credits');
   }
 
-  async getCreditHistory(): Promise<ApiResponse<Credit[]>> {
-    return this.request<Credit[]>('/api/payments/history');
+  async getCreditHistory(): Promise<ApiResponse<PaginatedResponse<Credit>>> {
+    return this.request<PaginatedResponse<Credit>>('/api/payments/history');
   }
 
-  async getAvailablePacks(): Promise<ApiResponse<any>> {
-    return this.request<any>('/api/payments/packs');
+  async getAvailablePacks(): Promise<ApiResponse<PacksResponse>> {
+    return this.request<PacksResponse>('/api/payments/packs');
   }
 
   // ── Delegations ─────────────────────────────────────────────────
@@ -137,14 +144,14 @@ export class NinjalinkingApiClient {
     );
   }
 
-  async getDelegation(id: string): Promise<ApiResponse<DelegatedOrder>> {
-    return this.request<DelegatedOrder>(`/api/orders/delegation/${id}`);
+  async getDelegation(id: string): Promise<ApiResponse<DelegationDetailsResponse>> {
+    return this.request<DelegationDetailsResponse>(`/api/orders/delegation/${id}`);
   }
 
   async createDelegation(
     params: CreateDelegationParams
-  ): Promise<ApiResponse<{ checkout_url: string; delegation: DelegatedOrder }>> {
-    return this.request<{ checkout_url: string; delegation: DelegatedOrder }>(
+  ): Promise<ApiResponse<CreateDelegationResponse>> {
+    return this.request<CreateDelegationResponse>(
       '/api/orders/delegation/create',
       'POST',
       params
@@ -152,7 +159,7 @@ export class NinjalinkingApiClient {
   }
 
   // ── Links ───────────────────────────────────────────────────────
-  async getLink(id: string): Promise<ApiResponse<Link>> {
-    return this.request<Link>(`/api/links/${id}`);
+  async getLink(id: string): Promise<ApiResponse<LinkResponse>> {
+    return this.request<LinkResponse>(`/api/links/${id}`);
   }
 }

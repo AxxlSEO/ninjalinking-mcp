@@ -99,10 +99,10 @@ Crée une commande de backlinks. Chaque lien coûte 1 crédit.
 | Paramètre | Type | Requis | Description |
 |-----------|------|--------|-------------|
 | `label` | string | Non | Nom de la commande |
+| `customer_email` | string | Non | Admin uniquement : passer la commande au nom du client ayant cet email |
 | `links` | array | Oui | Liens à commander (max 55 au total) |
 | `links[].page_target` | string | Oui | URL cible du backlink |
-| `links[].anchor_type` | string | Oui | `exact`, `partial` ou `generic` |
-| `links[].niche` | string | Non | Catégorie/thématique |
+| `links[].anchor_type` | string | Oui | Ancre ou type d'ancre (texte libre) |
 | `links[].delivery_date` | string | Non | Mois de livraison (format `YYYY-MM`) |
 | `links[].comment` | string | Non | Instructions supplémentaires |
 | `links[].qty` | number | Non | Nombre de backlinks (défaut: 1) |
