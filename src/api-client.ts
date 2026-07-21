@@ -96,7 +96,11 @@ export class NinjalinkingApiClient {
 
   private async integrationRead<T>(path: string, legacyPath: string, legacyMap: (value: unknown) => T): Promise<ApiResult<T>> {
     const result = await this.request<T>(`/api/integrations/v1${path}`);
-    if (result.ok || result.status !== 403 || !this.legacyReadFallback) return result;
+    if (result.ok || !this.legacyReadFallback) return result;
+    // 403/404 : route integrations absente ou interdite. invalid_json : la route
+    // n'existe pas côté Laravel et le catch-all SPA renvoie du HTML en 200.
+    const missing = result.status === 403 || result.status === 404 || result.code === 'invalid_json';
+    if (!missing) return result;
     const legacy = await this.request<unknown>(legacyPath);
     return legacy.ok ? { ...legacy, data: legacyMap(legacy.data) } : legacy;
   }
