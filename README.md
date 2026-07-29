@@ -72,3 +72,7 @@ npm audit --omit=dev
 ```
 
 La publication npm est déclenchée par un tag `vX.Y.Z` après validation explicite du premier publish et configuration du trusted publishing npm.
+
+## Support
+- Documentation : [app.linkontext.com/api-access](https://app.linkontext.com/api-access)
+- Contact : axelguyennot@ninjalinking.fr
