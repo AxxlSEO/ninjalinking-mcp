@@ -8,7 +8,7 @@ import { createServer } from './server.js';
 dotenv.config();
 
 async function main() {
-  const apiUrl = process.env.NINJALINKING_API_URL || 'https://app.ninjalinking.fr';
+  const apiUrl = process.env.NINJALINKING_API_URL || 'https://app.linkontext.com';
   const apiToken = process.env.NINJALINKING_API_TOKEN || process.env.GOUDO_API_TOKEN || '';
   const api = new NinjalinkingApiClient(apiUrl, apiToken, {
     allowCustomHost: process.env.NINJALINKING_ALLOW_CUSTOM_HOST === 'true',

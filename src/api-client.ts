@@ -15,7 +15,11 @@ export interface ClientOptions {
   legacyReadFallback?: boolean;
 }
 
-const DEFAULT_HOST = 'app.ninjalinking.fr';
+const DEFAULT_HOST = 'app.linkontext.com';
+// Hôtes officiels acceptés sans NINJALINKING_ALLOW_CUSTOM_HOST.
+// app.ninjalinking.fr conservé pour rétrocompat (migration domaine 07/2026,
+// l'API y reste servie) — les clients existants ne cassent pas.
+const ALLOWED_HOSTS = new Set([DEFAULT_HOST, 'app.ninjalinking.fr']);
 const RETRYABLE = new Set([429, 502, 503, 504]);
 
 export class NinjalinkingApiClient {
@@ -192,11 +196,11 @@ export class NinjalinkingApiClient {
 }
 
 export function validateBaseUrl(value: string, allowCustomHost: boolean): string {
-  const url = new URL(value || 'https://app.ninjalinking.fr');
+  const url = new URL(value || 'https://app.linkontext.com');
   const local = url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '::1';
   if (url.protocol !== 'https:' && !local) throw new Error('The API URL must use HTTPS.');
   if (url.username || url.password || url.search || url.hash) throw new Error('The API URL must not contain credentials, query, or fragment.');
-  if (!allowCustomHost && !local && url.hostname !== DEFAULT_HOST) {
+  if (!allowCustomHost && !local && !ALLOWED_HOSTS.has(url.hostname)) {
     throw new Error('Custom API hosts require NINJALINKING_ALLOW_CUSTOM_HOST=true.');
   }
   return url.toString().replace(/\/$/, '');

@@ -37,7 +37,7 @@ Configuration Claude Desktop :
 }
 ```
 
-`NINJALINKING_API_URL` est optionnelle et vaut `https://app.ninjalinking.fr` par défaut. Un hôte différent exige `NINJALINKING_ALLOW_CUSTOM_HOST=true`. HTTP n’est accepté que pour localhost.
+`NINJALINKING_API_URL` est optionnelle et vaut `https://app.linkontext.com` par défaut (l'ancien `https://app.ninjalinking.fr` reste accepté, l'API y est toujours servie). Un autre hôte exige `NINJALINKING_ALLOW_CUSTOM_HOST=true`. HTTP n’est accepté que pour localhost.
 
 ## Flux sécurisé des écritures
 
