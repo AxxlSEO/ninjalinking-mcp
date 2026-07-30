@@ -33,7 +33,12 @@ try {
 
 function command(binary, args, options) {
   return new Promise((resolve, reject) => {
-    const child = spawn(binary, args, { ...options, shell: false });
+    // Sur Windows, `npm` est `npm.cmd` : inexécutable via spawn direct (ENOENT),
+    // et depuis le fix CVE-2024-27980 un `.cmd` exige shell:true. On passe donc
+    // par le shell (cmd résout npm -> npm.cmd via PATHEXT) en quotant les args.
+    const isWin = process.platform === 'win32';
+    const finalArgs = isWin ? args.map(a => (/[\s"]/.test(a) ? `"${a}"` : a)) : args;
+    const child = spawn(binary, finalArgs, { ...options, shell: isWin });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', chunk => { stdout += chunk; });
