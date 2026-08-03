@@ -18,7 +18,7 @@ const preview = { ...readOnly, openWorldHint: true };
 const commit = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true };
 
 export function createServer(api: NinjalinkingApiClient): McpServer {
-  const server = new McpServer({ name: 'ninjalinking-mcp', version: '2.1.0' });
+  const server = new McpServer({ name: 'ninjalinking-mcp', version: '2.2.0' });
 
   register(server, 'get_profile', {
     description: 'Return the minimal NinjaLinking profile: id, name, role, and credit balance.',
@@ -67,13 +67,13 @@ export function createServer(api: NinjalinkingApiClient): McpServer {
   }, args => api.getLink(args.link_id));
 
   register(server, 'preview_order', {
-    description: 'Preview the exact credit impact of an order. Call this before create_order and show the preview to the user.',
+    description: 'Preview the exact credit impact of an order. Call this before create_order and show the preview to the user. Links may carry an optional due_date (YYYY-MM-DD): a hard "delivered no later than" deadline, at least 3 days out — tight deadlines are flagged in due_date_warnings.',
     inputSchema: orderPayload,
     annotations: preview,
   }, args => api.previewOrder(args));
 
   register(server, 'create_order', {
-    description: 'Commit a previously previewed order. Use the unchanged payload, confirmation token, and a stable idempotency key. This may spend credits.',
+    description: 'Commit a previously previewed order. Use the unchanged payload, confirmation token, and a stable idempotency key. This may spend credits. Optional per-link due_date (YYYY-MM-DD) is a "delivered no later than" deadline (server enforces a minimum lead time).',
     inputSchema: orderPayload.extend(commitFields),
     annotations: commit,
   }, args => api.createOrder(args));

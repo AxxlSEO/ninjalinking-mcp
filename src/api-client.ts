@@ -250,7 +250,7 @@ function pick(value: Record<string, unknown>, keys: string[]) {
 
 function sanitizeLink(value: unknown) {
   const link = asRecord(value);
-  return pick(link, ['id', 'page_target', 'anchor_type', 'work_step', 'delivery_date', 'comment', 'position', 'backlink_url']);
+  return pick(link, ['id', 'page_target', 'anchor_type', 'work_step', 'delivery_date', 'due_date', 'comment', 'position', 'backlink_url']);
 }
 
 function sanitizeOrder(value: unknown) {

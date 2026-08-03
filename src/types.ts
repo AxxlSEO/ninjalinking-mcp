@@ -22,6 +22,7 @@ export interface CreateOrderLink {
   page_target: string;
   anchor_type: string;
   delivery_date?: string;
+  due_date?: string;
   comment?: string;
   qty?: number;
 }
