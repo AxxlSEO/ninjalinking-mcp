@@ -7,6 +7,13 @@ const httpUrl = z.string().max(2048).url().refine(value => {
 
 const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'Use a real month in YYYY-MM format.');
 
+const isoDate = z.string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, 'Use a real date in YYYY-MM-DD format.')
+  .refine(value => {
+    const parsed = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+  }, 'Use a real calendar date in YYYY-MM-DD format.');
+
 export const emptyInput = z.object({});
 export const pageSize = z.number().int().min(1).max(100).default(25);
 export const orderStatus = z.enum(['unpaid', 'paid', 'pending', 'in_control', 'complete']);
@@ -18,6 +25,9 @@ export const orderPayload = z.object({
     page_target: httpUrl,
     anchor_type: z.string().trim().min(1).max(255),
     delivery_date: yearMonth.optional(),
+    // Deadline "livré au plus tard le" (J+3 minimum) — la validation métier
+    // (délai, horizon, cohérence avec delivery_date) reste côté serveur.
+    due_date: isoDate.optional(),
     comment: z.string().max(255).optional(),
     qty: z.number().int().min(1).max(55).default(1),
   })).min(1).max(55).refine(

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 — 2026-08-04
+
+- Nouveau champ optionnel `links[].due_date` (YYYY-MM-DD) sur `preview_order` / `create_order` : deadline « livré au plus tard le ». Validation métier côté serveur (J+3 minimum, 12 mois maximum, cohérence avec `delivery_date`). Les deadlines serrées sont signalées par `due_date_warnings` dans le preview.
+- `due_date` exposée dans les liens retournés (`get_order`, `get_link`, `create_order`).
+
 ## 2.1.0 — 2026-07-11
 
 - Nouveau contrat `/api/integrations/v1` avec abilities Sanctum dédiées.

@@ -1,6 +1,6 @@
 {
   "name": "ninjalinking-mcp",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Local MCP server for secure NinjaLinking backlink order management",
   "main": "dist/index.js",
   "bin": {
