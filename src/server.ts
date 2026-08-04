@@ -18,7 +18,7 @@ const preview = { ...readOnly, openWorldHint: true };
 const commit = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true };
 
 export function createServer(api: NinjalinkingApiClient): McpServer {
-  const server = new McpServer({ name: 'ninjalinking-mcp', version: '2.3.0' });
+  const server = new McpServer({ name: 'ninjalinking-mcp', version: '2.3.1' });
 
   register(server, 'get_profile', {
     description: 'Return the minimal NinjaLinking profile: id, name, role, and credit balance.',

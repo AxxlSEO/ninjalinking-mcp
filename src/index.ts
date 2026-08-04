@@ -16,7 +16,7 @@ async function main() {
     legacyWriteFallback: process.env.NINJALINKING_LEGACY_WRITE_FALLBACK !== 'false',
   });
   await createServer(api).connect(new StdioServerTransport());
-  console.error(JSON.stringify({ event: 'server_started', transport: 'stdio', version: '2.3.0' }));
+  console.error(JSON.stringify({ event: 'server_started', transport: 'stdio', version: '2.3.1' }));
 }
 
 main().catch(error => {

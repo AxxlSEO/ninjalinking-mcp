@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1 — 2026-08-04
+
+- `npm audit fix` : correctifs transitifs `hono` (ReDoS CORS) et `ip-address` (SSRF) qui bloquaient la release npm de 2.3.0 (jamais publiée).
+
 ## 2.3.0 — 2026-08-04
 
 - Fallback legacy sur les écritures commandes tant que `/api/integrations/v1` n'est pas déployé (rollout prod prévu le 10/08) : `create_order` → `POST /api/orders`, `pay_order` → `POST /api/orders/{id}/pay`, `preview_order` / `preview_order_payment` émulés localement (impact crédits + `due_date_warnings`). Les réponses fallback portent `legacy_fallback: true` ; sur ce chemin il n'y a ni idempotence serveur ni vérification du `confirmation_token` (la validation métier — J+3, gate clé API, horizon — reste serveur). Désactivable via `NINJALINKING_LEGACY_WRITE_FALLBACK=false`.
