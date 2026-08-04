@@ -13,9 +13,10 @@ async function main() {
   const api = new NinjalinkingApiClient(apiUrl, apiToken, {
     allowCustomHost: process.env.NINJALINKING_ALLOW_CUSTOM_HOST === 'true',
     legacyReadFallback: process.env.NINJALINKING_LEGACY_READ_FALLBACK !== 'false',
+    legacyWriteFallback: process.env.NINJALINKING_LEGACY_WRITE_FALLBACK !== 'false',
   });
   await createServer(api).connect(new StdioServerTransport());
-  console.error(JSON.stringify({ event: 'server_started', transport: 'stdio', version: '2.1.0' }));
+  console.error(JSON.stringify({ event: 'server_started', transport: 'stdio', version: '2.3.0' }));
 }
 
 main().catch(error => {

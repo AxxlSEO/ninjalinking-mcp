@@ -15,7 +15,8 @@ try {
   await command('npm', ['install', tarball, '--ignore-scripts'], { cwd: temp });
 
   const manifest = JSON.parse(await readFile(join(temp, 'node_modules', 'ninjalinking-mcp', 'package.json'), 'utf8'));
-  assert.equal(manifest.version, '2.1.0');
+  const source = JSON.parse(await readFile(new URL('package.json', root), 'utf8'));
+  assert.equal(manifest.version, source.version);
   assert.equal(manifest.bin['ninjalinking-mcp'], 'dist/index.js');
 
   const child = spawn(process.execPath, [join(temp, 'node_modules', 'ninjalinking-mcp', 'dist', 'index.js')], {
