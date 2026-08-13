@@ -12,7 +12,27 @@ Ce package n’est pas une app ChatGPT. Une intégration ChatGPT multi-utilisate
 
 Les clés créées avant la version 2.1 n’ont que `orders:read/orders:write`. Elles peuvent encore lire via le fallback transitoire, mais doivent être régénérées pour les previews et écritures sécurisées.
 
-## Installation locale avant publication npm
+## Installation
+
+Le package est publié sur npm : [`ninjalinking-mcp`](https://www.npmjs.com/package/ninjalinking-mcp).
+
+Configuration Claude Desktop (ou tout client MCP `stdio`) :
+
+```json
+{
+  "mcpServers": {
+    "ninjalinking": {
+      "command": "npx",
+      "args": ["-y", "ninjalinking-mcp"],
+      "env": {
+        "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
+      }
+    }
+  }
+}
+```
+
+### Depuis les sources
 
 ```bash
 git clone https://github.com/AxxlSEO/ninjalinking-mcp.git
@@ -21,21 +41,7 @@ npm ci
 npm test
 ```
 
-Configuration Claude Desktop :
-
-```json
-{
-  "mcpServers": {
-    "ninjalinking": {
-      "command": "node",
-      "args": ["/CHEMIN/ninjalinking-mcp/dist/index.js"],
-      "env": {
-        "NINJALINKING_API_TOKEN": "VOTRE_CLE_API"
-      }
-    }
-  }
-}
-```
+Puis pointer la config sur `node /CHEMIN/ninjalinking-mcp/dist/index.js` au lieu de `npx`.
 
 `NINJALINKING_API_URL` est optionnelle et vaut `https://app.linkontext.com` par défaut (l'ancien `https://app.ninjalinking.fr` reste accepté, l'API y est toujours servie). Un autre hôte exige `NINJALINKING_ALLOW_CUSTOM_HOST=true`. HTTP n’est accepté que pour localhost.
 
