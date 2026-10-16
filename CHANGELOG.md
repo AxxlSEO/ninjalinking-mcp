@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.2 — 2026-10-16
+
+- `links[].anchor_type` documenté dans le schéma des outils `preview_order` / `create_order` : texte libre portant l'ancre à utiliser (texte exact à copier-coller, URL nue ou consigne d'optimisation), et non une catégorie `exact`/`partial`/`generic`. Un client avait réduit le champ à une catégorie et déplacé l'ancre dans `comment`.
+- `links[].comment` documenté comme consigne de placement.
+
 ## 2.3.1 — 2026-08-04
 
 - `npm audit fix` : correctifs transitifs `hono` (ReDoS CORS) et `ip-address` (SSRF) qui bloquaient la release npm de 2.3.0 (jamais publiée).

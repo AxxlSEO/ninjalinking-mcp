@@ -67,7 +67,7 @@ export function createServer(api: NinjalinkingApiClient): McpServer {
   }, args => api.getLink(args.link_id));
 
   register(server, 'preview_order', {
-    description: 'Preview the exact credit impact of an order. Call this before create_order and show the preview to the user. Links may carry an optional due_date (YYYY-MM-DD): a hard "delivered no later than" deadline, at least 3 days out — tight deadlines are flagged in due_date_warnings.',
+    description: 'Preview the exact credit impact of an order. Call this before create_order and show the preview to the user. Each link anchor_type is free text holding the anchor to use (exact wording to copy-paste or an optimisation instruction), not an exact/partial/generic category. Links may carry an optional due_date (YYYY-MM-DD): a hard "delivered no later than" deadline, at least 3 days out — tight deadlines are flagged in due_date_warnings.',
     inputSchema: orderPayload,
     annotations: preview,
   }, args => api.previewOrder(args));

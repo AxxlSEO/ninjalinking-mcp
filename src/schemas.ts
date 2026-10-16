@@ -23,12 +23,16 @@ export const orderPayload = z.object({
   customer_email: z.string().email().max(255).optional(),
   links: z.array(z.object({
     page_target: httpUrl,
-    anchor_type: z.string().trim().min(1).max(255),
+    // Nom historique trompeur : ce champ porte le TEXTE de l'ancre (ou une consigne
+    // d'optimisation), pas une catégorie exact/partial/generic.
+    anchor_type: z.string().trim().min(1).max(255).describe(
+      'Free text, NOT a category. Put here the anchor wording the link builder must use: either the exact anchor text to copy-paste verbatim (e.g. "snow socks from Musher", or a bare URL for a naked-URL anchor), or an optimisation instruction in plain words (e.g. "partial anchor around winter tyres"). Do not reduce it to "exact", "partial" or "generic" and do not move the anchor text into comment.'
+    ),
     delivery_date: yearMonth.optional(),
     // Deadline "livré au plus tard le" (J+3 minimum) — la validation métier
     // (délai, horizon, cohérence avec delivery_date) reste côté serveur.
     due_date: isoDate.optional(),
-    comment: z.string().max(255).optional(),
+    comment: z.string().max(255).optional().describe('Optional placement instructions for the link builder (topic, forum context, what the author should say). The anchor itself belongs in anchor_type.'),
     qty: z.number().int().min(1).max(55).default(1),
   })).min(1).max(55).refine(
     links => links.reduce((sum, link) => sum + link.qty, 0) <= 55,

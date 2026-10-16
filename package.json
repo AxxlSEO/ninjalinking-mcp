@@ -1,6 +1,6 @@
 {
   "name": "ninjalinking-mcp",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Local MCP server for secure NinjaLinking backlink order management",
   "main": "dist/index.js",
   "bin": {
@@ -22,7 +22,16 @@
     "smoke:pack": "node tests/package-smoke.mjs",
     "prepack": "npm run build"
   },
-  "keywords": ["mcp", "ninjalinking", "backlinks", "seo", "orders", "ai", "claude", "model-context-protocol"],
+  "keywords": [
+    "mcp",
+    "ninjalinking",
+    "backlinks",
+    "seo",
+    "orders",
+    "ai",
+    "claude",
+    "model-context-protocol"
+  ],
   "author": "NinjaLinking <axelguyennot@ninjalinking.fr>",
   "license": "MIT",
   "repository": {
