@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.3 — 2026-10-16
+
+- `label` obligatoire sur `preview_order` / `create_order`, comme dans le formulaire de l'interface.
+- `links[].comment` : limite portée de 255 à 5000 caractères (alignée sur le back `fix/mcp-parite-front`).
+- 2.3.2 n'a jamais été publiée sur npm (échec Trusted Publishing E404) : cette version la remplace.
+
 ## 2.3.2 — 2026-10-16
 
 - `links[].anchor_type` documenté dans le schéma des outils `preview_order` / `create_order` : texte libre portant l'ancre à utiliser (texte exact à copier-coller, URL nue ou consigne d'optimisation), et non une catégorie `exact`/`partial`/`generic`. Un client avait réduit le champ à une catégorie et déplacé l'ancre dans `comment`.

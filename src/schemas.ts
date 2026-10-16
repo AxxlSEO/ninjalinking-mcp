@@ -19,7 +19,9 @@ export const pageSize = z.number().int().min(1).max(100).default(25);
 export const orderStatus = z.enum(['unpaid', 'paid', 'pending', 'in_control', 'complete']);
 
 export const orderPayload = z.object({
-  label: z.string().max(255).optional(),
+  // Obligatoire dans le formulaire de l'interface : on aligne, sinon la vue
+  // admin se remplit de commandes sans nom.
+  label: z.string().trim().min(1).max(255).describe('Order name shown to the client and the admins, e.g. "Acme — November 2026". Required, like in the web form.'),
   customer_email: z.string().email().max(255).optional(),
   links: z.array(z.object({
     page_target: httpUrl,
@@ -32,7 +34,7 @@ export const orderPayload = z.object({
     // Deadline "livré au plus tard le" (J+3 minimum) — la validation métier
     // (délai, horizon, cohérence avec delivery_date) reste côté serveur.
     due_date: isoDate.optional(),
-    comment: z.string().max(255).optional().describe('Optional placement instructions for the link builder (topic, forum context, what the author should say). The anchor itself belongs in anchor_type.'),
+    comment: z.string().max(5000).optional().describe('Optional placement instructions for the link builder (topic, forum context, what the author should say). The anchor itself belongs in anchor_type.'),
     qty: z.number().int().min(1).max(55).default(1),
   })).min(1).max(55).refine(
     links => links.reduce((sum, link) => sum + link.qty, 0) <= 55,
