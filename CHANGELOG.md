@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.4 — 2026-10-24
+
+- `npm audit fix` : zod (GHSA-mrhx-c7xc-m3w5), body-parser (GHSA-27r3-jxmh-p828), hono (GHSA-5r4p-p66f-jhc7), fast-uri (4 avis) — avis publiés après le 16/10, bloquaient la release de 2.3.3 (jamais publiée).
+- `homepage` → `https://app.linkontext.com/mcp-access` (l'ancienne URL ninjalinking.fr redirige en 301).
+
 ## 2.3.3 — 2026-10-16
 
 - `label` obligatoire sur `preview_order` / `create_order`, comme dans le formulaire de l'interface.
